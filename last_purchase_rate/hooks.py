@@ -1,8 +1,8 @@
 app_name = "last_purchase_rate"
 app_title = "Last Purchase Rate"
-app_publisher = "ramees"
+app_publisher = "Abid Khan"
 app_description = "To get Last Purchase Rate in Sales Invoice"
-app_email = "ramees@enfono.in"
+app_email = "abidkh.ak64@gmail.com"
 app_license = "mit"
 
 # Apps
