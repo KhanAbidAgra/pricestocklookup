@@ -1,14 +1,12 @@
-frappe.ui.form.on('Sales Invoice', {
+frappe.ui.form.on('Purchase Invoice', {
 	refresh: function (frm) {
 		lpr_inject_styles();
-		setTimeout(() => lpr_add_buttons(frm, 'sales'), 1000);
+		setTimeout(() => lpr_add_buttons(frm, 'purchase'), 1000);
 	},
 	items_add: function (frm) {
-		setTimeout(() => lpr_add_buttons(frm, 'sales'), 500);
+		setTimeout(() => lpr_add_buttons(frm, 'purchase'), 500);
 	}
 });
-
-// ── Shared UI helpers ──────────────────────────────────────────────────────────
 
 function lpr_inject_styles() {
 	if (document.getElementById('lpr-styles')) return;
@@ -39,7 +37,6 @@ function lpr_inject_styles() {
 		.lpr-section-title{font-weight:700;font-size:11px;color:var(--text-muted,#8d99a6);text-transform:uppercase;letter-spacing:.6px}
 		.lpr-collapse-icon{font-size:10px;color:var(--text-muted,#8d99a6);transition:transform .2s}
 		.lpr-section-collapsed .lpr-collapse-icon{transform:rotate(-90deg)}
-		.lpr-section-body{transition:none}
 		.lpr-tab-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border-color,#d1d8dd)}
 		.lpr-tab{padding:5px 14px;border-radius:20px;border:1px solid var(--border-color,#d1d8dd);cursor:pointer;font-size:12px;background:var(--control-bg,#f4f5f7);transition:all .15s;user-select:none}
 		.lpr-tab:hover{background:#e8eeff;border-color:var(--primary,#5e64ff)}
@@ -54,17 +51,13 @@ function lpr_inject_styles() {
 
 function lpr_add_buttons(frm, mode) {
 	if (frm._lpr_btns_added) return;
-	let $grid = frm.$wrapper.find('[data-fieldname="items"] .grid-footer');
-	if (!$grid.length) $grid = frm.$wrapper.find('[data-fieldname="items"]');
-	if (!$grid.length) return;
+	let $sec = frm.$wrapper.find('[data-fieldname="items"]');
+	if (!$sec.length) return;
 	let $row = $('<div class="lpr-btn-row" style="display:flex;gap:8px;padding:6px 0 2px"></div>');
-	// let $stockBtn = $(`<button class="btn btn-default btn-sm">${__('Stock Balance')}</button>`);
-	// $stockBtn.on('click', () => lpr_open_stock_dialog(frm));
-	// $row.append($stockBtn);
 	let $histBtn = $(`<button class="btn btn-default btn-sm">${__('Price History')}</button>`);
 	$histBtn.on('click', () => lpr_open_history_dialog(frm, mode));
 	$row.append($histBtn);
-	frm.$wrapper.find('[data-fieldname="items"]').append($row);
+	$sec.append($row);
 	frm._lpr_btns_added = true;
 }
 
@@ -255,61 +248,3 @@ function lpr_bind_filters($pane) {
 		});
 	});
 }
-
-// ── Stock Balance dialog ───────────────────────────────────────────────────────
-
-// function lpr_open_stock_dialog(frm) {
-// 	let d = new frappe.ui.Dialog({
-// 		title: __('Item Warehouse Stock'),
-// 		size: 'large',
-// 		fields: [
-// 			{
-// 				fieldname: 'item_code', fieldtype: 'Link', label: __('Item Code'),
-// 				options: 'Item', reqd: 1,
-// 				onchange() { const v = d.get_value('item_code'); if (v) lpr_fetch_warehouse_qty(v, d); }
-// 			},
-// 			{ fieldtype: 'HTML', fieldname: 'result_html' }
-// 		]
-// 	});
-// 	d.show();
-// 	d.$wrapper.find('.modal-dialog').css({ 'max-width': '75%', width: '75%' });
-// }
-
-// function lpr_fetch_warehouse_qty(item_code, dialog) {
-// 	frappe.call({
-// 		method: 'last_purchase_rate.last_purchase_rate.api.sales_invoice_dialog_button.get_item_warehouse_qty',
-// 		args: { item_code },
-// 		callback(r) {
-// 			if (r.message) lpr_render_stock_table(dialog, r.message);
-// 			else dialog.fields_dict.result_html.$wrapper.html(`<div class="lpr-empty">${__('No data found.')}</div>`);
-// 		}
-// 	});
-// }
-
-// function lpr_render_stock_table(dialog, data) {
-// 	const pls = data.price_lists || [], rows = data.rows || [];
-// 	let html = '<div class="lpr-table-wrap"><table class="lpr-table"><thead><tr>';
-// 	[__('Item Code'), __('Description'), __('Warehouse'), __('Available Qty')].forEach(h => { html += `<th>${h}</th>`; });
-// 	pls.forEach(pl => { html += `<th>${frappe.utils.escape_html(pl)}</th>`; });
-// 	html += '</tr><tr class="lpr-filter-row">';
-// 	[__('Item'), __('Description'), __('Warehouse'), __('Qty')].forEach(p => { html += `<th><input placeholder="${p}"></th>`; });
-// 	pls.forEach(() => { html += `<th><input placeholder="${__('Rate')}"></th>`; });
-// 	html += '</tr></thead><tbody>';
-// 	rows.forEach(r => {
-// 		html += `<tr><td>${frappe.utils.escape_html(r.item_code)}</td><td>${frappe.utils.escape_html(r.description || '')}</td><td>${frappe.utils.escape_html(r.warehouse)}</td><td class="lpr-num">${format_number(r.qty || 0)}</td>`;
-// 		pls.forEach(pl => { html += `<td class="lpr-num lpr-rate">${format_currency(r.prices?.[pl] || 0)}</td>`; });
-// 		html += '</tr>';
-// 	});
-// 	html += '</tbody></table></div>';
-// 	dialog.fields_dict.result_html.$wrapper.html(html);
-// 	const $tbl = dialog.fields_dict.result_html.$wrapper.find('.lpr-table');
-// 	$tbl.find('.lpr-filter-row input').each(function (ci) {
-// 		$(this).on('input', function () {
-// 			const val = this.value.toLowerCase().trim();
-// 			$tbl.find('tbody tr').each(function () {
-// 				const cell = this.cells[ci];
-// 				this.style.display = (!val || (cell && cell.textContent.toLowerCase().includes(val))) ? '' : 'none';
-// 			});
-// 		});
-// 	});
-// }

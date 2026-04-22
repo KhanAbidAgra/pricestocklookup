@@ -44,9 +44,13 @@ app_license = "mit"
 
 # include js in doctype views
 doctype_js = {
-    "Sales Invoice": "public/js/sales_invoice.js",
-    "Delivery Note": "public/js/deliver_note.js",
-    "Sales Order": "public/js/sales_order.js",
+    "Sales Invoice":      "public/js/sales_invoice.js",
+    "Delivery Note":      "public/js/deliver_note.js",
+    "Sales Order":        "public/js/sales_order.js",
+    "Quotation":          "public/js/quotation.js",
+    "Purchase Order":     "public/js/purchase_order.js",
+    "Purchase Invoice":   "public/js/purchase_invoice.js",
+    "Supplier Quotation": "public/js/supplier_quotation.js",
 }
 
 fixtures = [
